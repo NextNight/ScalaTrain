@@ -1,0 +1,8 @@
+RDD持久化：
+    每个节点将各自操作的RDD的partition持久化到内存中，瑞昱重复操作RDD的场景，可以减少计算，在某些场景甚至能让spark的性能替身10倍。
+
+    方式：内存缓存
+        cache():cache是persist的一种叫简化版本，调用persist的无参构造。
+        persist(stoarge leve):
+
+    三种策略：指定storageleve,只当存储在哪里

@@ -21,11 +21,11 @@ public class Transformation {
         flatMapTest();
         groupByKeyTest();
         reduceByKeyTest();
-        joinAndCoGroupTest();
+       joinAndCoGroupTest();
     }
 
     /**
-     * map算子：给集合每个元素*2
+     * map算子：对给党的参数进行函数映射，给集合每个元素*2
      */
     private static void mapTest() {
         SparkConf conf = new SparkConf().setAppName("mapTest").setMaster("local");
@@ -48,7 +48,7 @@ public class Transformation {
 
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         JavaRDD<Integer> numRDD = jsc.parallelize(list);
-        //这里用返回值是因为要判断过滤的结果是保留丢弃，true则保留
+        //过滤偶数集合
         JavaRDD<Integer> num2RDD = numRDD.filter(num -> num % 2 == 0);
         num2RDD.foreach(num2 -> System.out.println(num2 + " "));
 
@@ -81,7 +81,7 @@ public class Transformation {
 
     /**
      * groupByKey算子：按key分组,
-     * sortByKey:按key排序
+     * sortByKey:按key排序,无参由小到大，参数false,由大到小
      */
     private static void groupByKeyTest() {
         SparkConf conf = new SparkConf().setAppName("groupByKeyTest").setMaster("local");
@@ -113,7 +113,7 @@ public class Transformation {
     }
 
     /**
-     * reduceByKey算子：按key分组并聚合，即key相同则V相加,
+     * reduceByKey算子：按key分组并聚合(聚合函数可以自己定义)，即key相同则V相加,
      */
     private static void reduceByKeyTest() {
         SparkConf conf = new SparkConf().setAppName("reduceByKeyTest").setMaster("local");
@@ -131,7 +131,7 @@ public class Transformation {
         JavaPairRDD<String,Integer> scoreGroupRDD = scoreRDD.reduceByKey((v1,v2)->v1+v2);
 
         scoreGroupRDD.foreach(
-                score->System.out.println(score._1+": "+score._2)
+                score->System.out.println("re"+score.toString())
         );
 
         jsc.close();
@@ -139,8 +139,8 @@ public class Transformation {
     }
 
     /**
-     * join算子：关联兩個RDD
-     * cogroup算子;
+     * join算子：关联兩個RDD，相当于内链接
+     * cogroup算子;相当于全链接
      */
     private static void joinAndCoGroupTest(){
         SparkConf conf = new SparkConf().setMaster("local").setAppName("joinAndCoGroupTest");

@@ -18,7 +18,7 @@ import java.util.Iterator;
  * Author:rzx
  * Date:2017/6/19
  */
-public class WordCountLocal {
+public class WordCount {
     public static void main(String [] args){
         SparkConf conf = new SparkConf()
                 .setAppName("WountCountLocal")
@@ -62,6 +62,10 @@ public class WordCountLocal {
         JavaPairRDD<String, Integer> counts =
                 words.mapToPair(w -> new Tuple2<String, Integer>(w, 1))
                         .reduceByKey((x, y) -> x + y);
-        counts.foreach(count-> System.out.println(count._1()+" "+count._2()));
+        counts.foreach(cn -> System.out.println(cn._1+" "+cn._2));
+       /* //进行K-V反转,
+        JavaPairRDD<Integer,String> resverCounts = counts.mapToPair(count->{return new Tuple2<Integer,String>(count._2,count._1);});
+        //按K排序
+        resverCounts.sortByKey(false).foreach(scount-> System.out.println(scount._1+" "+scount._2));*/
     }
 }

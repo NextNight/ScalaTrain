@@ -1,12 +1,14 @@
 package cn.spark.study.core;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author:rzx
@@ -17,7 +19,8 @@ public class Action {
         reduceTest();
         collectTest();
         takeTest();
-        savaAsTextFileTest();
+        saveAsTextFileTest();
+        countByKeyTest();
     }
 
     /**
@@ -57,7 +60,7 @@ public class Action {
         //collect:将RDD的数据拉取到本地，变成了java的List,
         List<Integer> listNum= doubleNumRDD.collect();
         listNum.forEach(
-                num-> System.out.printf(num.toString())
+                num-> System.out.printf(num.toString()+" ")
         );
 
         jsc.close();
@@ -83,22 +86,22 @@ public class Action {
     }
 
     /**
-     * savaAsTextFile:保存到文件
+     * saveAsTextFile:保存到文件
      */
-    private static void savaAsTextFileTest(){
-        SparkConf conf = new SparkConf().setAppName("countByKeyTest").setMaster("local");
+    private static void saveAsTextFileTest(){
+        SparkConf conf = new SparkConf().setAppName("saveAsTextFile").setMaster("local");
         JavaSparkContext jsc = new JavaSparkContext(conf);
 
         List<String > list = Arrays.asList("hello world","how are you","nice to");
         JavaRDD<String> strRDD =  jsc.parallelize(list);
         //saveAsTextFile
-        strRDD.saveAsTextFile("input/str.txt");
+        strRDD.saveAsTextFile("input/str");
 
         jsc.close();
     }
 
     /**
-     * countByvalue:统计每个key的数量
+     * countBykey:统计每个key的数量
      */
     private static void countByKeyTest(){
         SparkConf conf = new SparkConf().setAppName("countByKeyTest").setMaster("local");
@@ -107,13 +110,16 @@ public class Action {
         List<Tuple2<Integer,Integer>> numList = Arrays.asList(
                 new Tuple2<>(1,100),
                 new Tuple2<>(2,50),
-                new Tuple2<>(3,100),
+                new Tuple2<>(1,100),
                 new Tuple2<>(4,80),
                 new Tuple2<>(5,50),
                 new Tuple2<>(6,80)
         );
-        JavaRDD<Tuple2<Integer,Integer>> numRDD  = jsc.parallelize(numList);
-        numRDD.countByValue();
+        //如果数据是tuple类型的则要用parallelizePairs来并行化，JavaPairRDD来接收类型，而你不是JavaRDD,
+        JavaPairRDD<Integer,Integer> numRDD  = jsc.parallelizePairs(numList);
+        Map<Integer,Long> count = numRDD.countByKey();
+        count.forEach((k,v)-> System.out.println(k+"--"+v));
+        jsc.close();
     }
 
 }
