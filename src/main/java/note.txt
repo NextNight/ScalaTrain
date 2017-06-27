@@ -6,3 +6,46 @@ RDD持久化：
         persist(stoarge leve):
 
     三种策略：指定storageleve,只当存储在哪里
+
+
+saprk三种提交模式：
+    1、standalone：Master-worker<spark的内核架构原理>
+    2、yarn-cluster:
+    3、yarn-client:
+
+sparkContext的原理剖析：
+    1--------
+
+sparkMaster的原理剖析：
+    1、Master的主备切换机制：
+       \\/|/\:Master实际上可以配置两个，用于Active Master崩掉的时候可以切换到备用的Master，Spark原生的standalone是支持主备切换
+       的，也就是说当ActiveMaster挂掉的时候可以切换standby Master为ActiveMaster.
+       \\/|/\:Spark Master的主备切换机制有两种：1、基于文件系统的，一种是基于Zookeeper的主备切换机制。基于文件系统的在
+       ActiveMaster挂掉之后，需要我们手动切换到standbyMaster,基于Zookeeper的主备切换自动完成的。
+       \\/|/\:这里说的主备切换机制是指切换到standbyMaster需要做哪些事情：
+       详情请见：resources/masterToStandbyMaster.png
+
+    2、Master的注册机制：
+
+
+    3、Master的状态改变机制
+    4、Master的资源调度机制
+sparkWorker的原理剖析：
+
+Job的触发流程分析：
+
+DAGSheduler的与原理了剖析：
+
+TaskSheduler的原理剖析：
+
+Executor与原理剖析：
+
+Task的原理剖析：
+
+Shuffle的与原理剖析
+
+BlockManager原理剖析
+
+CacheManager原理剖析
+
+CheckPoint原理剖析
