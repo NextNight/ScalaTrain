@@ -25,11 +25,16 @@ sparkMaster的原理剖析：
        \\/|/\:这里说的主备切换机制是指切换到standbyMaster需要做哪些事情：
        详情请见：resources/masterToStandbyMaster.png
 
-    2、Master的注册机制：
+    2、Master的注册机制：worker,Driver,Application的注册
+       1、Worker启动的时候就会向Master注册：然后过滤掉DEAD的Master，替换掉状态为UnKnown的Master的信息，然后将这些Master加入到内存
+       缓存中，然后加入到调度队列，最后持久化引擎进行信息持久化。最后调用sheduler()
+       2、
 
 
-    3、Master的状态改变机制
+    3、Master的状态改变机制:
+
     4、Master的资源调度机制
+
 sparkWorker的原理剖析：
 
 Job的触发流程分析：
