@@ -32,14 +32,31 @@ sparkMaster的原理剖析：
 
 
     3、Master的状态改变机制:
-
-    4、Master的资源调度机制
+       1、DriverStateChanged
+       2、ExecutorSateChanged
+    4、Master的资源调度机制：schedule,每次Apps加入或者，资源状态改变的时候都要调用shedule()方法让Master进行调度，
+       如果Master状态不是Active的话直接返回，说名standbyMaster是不做资源调度的。
+       1、Master首先调度Driver：取workers(hashset集合)过滤出存活的随机打乱(Random.shuffle)
+          ****只有使用yarn-cluster模式的时候 会注册Driver,其他两种模式只会在本地启动Driver线程*****
+          遍历workers,如果worker的条件(内存，CPU。。)满足Driver则启动Driver(launchDriver)，并将Driver从等待队列中移除。
+          将指针指向下一个Driver.
+       2、Application的调度机制：
+          1、spreadOutApps:
+             Master遍历waitingApps，找到需要调度的Apps,然后遍历workers,过滤出可以被Apps使用的worker(内存量足够Apps启动Executor)。
+             然后把Apps的Execuor平均分配到每个worker上。
+          2、非spreadOutApps；
+             将每一个Apps尽可能少的分配到Worker上，也就是说和i占用分配到的worker的最大资源，才会遍历下一个
 
 sparkWorker的原理剖析：
+       启动Driver和Executor
 
 Job的触发流程分析：
+       初始化完sparkContext,启动了Executor并且注册回Driver。
+       Action会调用SparkContext的runJob()方法.
 
 DAGSheduler的与原理了剖析：
+
+        stage划分算法：
 
 TaskSheduler的原理剖析：
 
@@ -49,8 +66,22 @@ Task的原理剖析：
 
 Shuffle的与原理剖析
 
-BlockManager原理剖析
+BlockManager原理剖析：内存数据缓存
 
 CacheManager原理剖析
 
 CheckPoint原理剖析
+
+========================================================================================================================
+sparkSql:
+    sparkSession:<SQlContext,HiveContext>
+        SparkSession是新的Spark上下文以及入口，用于合并SQLContext和HiveContext，并替代它们。因为以前提供了SQLContext和HiveContext两种上下文入口，因此用户有时会有些迷惑，到底该使用哪个接口。现在好了，只需要使用一个统一的SparkSession即可。但是为了向后兼容性，SQLContext和HiveContext还是保留下来了。
+    DataFrame:
+    Dataset:
+        从Spark 2.0开始，Dataframe就只是Dataset[Row]的一个别名，不再是一个单独的类了。无论是typed方法（map、filter、groupByKey等）还是untyped方法（select、groupBy等），都通过Dataset来提供。而且Dataset API将成为Spark的新一代流式计算框架——structured streaming的底层计算引擎。但是由于Python和R这两个语言都不具备compile-time type-safety的特性，所以就没有引入Dataset API，所以这两种语言中的主要编程接口还是Dataframe。
+    RDD->Dataset:转换
+        1、DataFrame是SparkSQl的数据接口，只要是DataFrame类型的数据都可以用SparkSQl来操作，所以对于来源于文件系统的个数据可以转换
+        成RDD操作，那么我们可以将RDD转换成DataFrame操作.
+        2、两种转换方式：
+           **通过反射来推断RDD的元数据，代码简洁，若已经知道元数据类型，很方便。
+           **通过编程接口来创建DataFrame,你可以在程序云锡尼个是动态构建一分元数据，用于你的RDD上。
