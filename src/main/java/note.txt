@@ -74,6 +74,7 @@ CheckPoint原理剖析
 
 ========================================================================================================================
 sparkSql:
+1、starting:
     sparkSession:<SQlContext,HiveContext>
         SparkSession是新的Spark上下文以及入口，用于合并SQLContext和HiveContext，并替代它们。因为以前提供了SQLContext和HiveContext两种上下文入口，因此用户有时会有些迷惑，到底该使用哪个接口。现在好了，只需要使用一个统一的SparkSession即可。但是为了向后兼容性，SQLContext和HiveContext还是保留下来了。
     DataFrame:
@@ -85,3 +86,17 @@ sparkSql:
         2、两种转换方式：
            **通过反射来推断RDD的元数据，代码简洁，若已经知道元数据类型，很方便。
            **通过编程接口来创建DataFrame,你可以在程序云锡尼个是动态构建一分元数据，用于你的RDD上。
+    聚合函数：
+        弱类型的用户自定义的聚合函数。
+        强类型的用户自定义的聚合函数。
+2、DataSource:
+    load/save:
+    Run SQL on files directly:
+    Saving to Persistent Tables
+    HIVE:
+    JDBC:
+3、内置函数：
+4、开窗函数：
+5、用户自定义函数：
+6、sparkSql优化：
+7、hive on spark

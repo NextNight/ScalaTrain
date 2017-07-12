@@ -23,6 +23,7 @@ public class DataSourceLoadAndSaveOp {
 
         //local加载数据源
         Dataset<Row> userDF = sparkSession.read().load("input/users.parquet");
+        //sparkSession.read().parquet("input/users.parquet");
         userDF.show(10);
         /*
         +------+--------------+----------------+
@@ -42,7 +43,7 @@ public class DataSourceLoadAndSaveOp {
          */
         //save数据，这里会出现文件存在得情况，提供了SaveModel解决文件已存在的情况
         userDF.select("name","favorite_color").write().format("parquet").save("input/namesAndFavColors.parquet");
-        userDF.select("name","favorite_color").write().parquet("wparquet.qprquet");
+       // userDF.select("name","favorite_color").write().parquet("wparquet.prquet");
         //数据源的想互转化,最后的保存结果都是hdfs形式，真不知道format是个什么鬼。
         sparkSession
                 .read()
@@ -56,16 +57,13 @@ public class DataSourceLoadAndSaveOp {
                 .load("input/people.json")
                 .select("name","age")
                 .write()
-                .format("parquet").save("input/nameage2.parquet");
+                .format("json").save("input/nameage2.json");
 
         //对一个文件执行sql;;;;;报错，，什么鬼
-        sparkSession.sql("select * FROM  parquet.'input/users.parquet'");
+        sparkSession.sql("select * FROM  parquet.`input/users.parquet`").show();
 
         //SaveModelSpark SQL对于save操作，提供了不同的save mode。主要用来处理，当目标位置，已经有数据时，应该如何处理。而且save操作并不会执行锁操作，并且不是原子的，因此是有一定风险出现脏数据的。
         //SaveMode.ErrorIfExists,SaveMode.Append,SaveMode.Overwrite,SaveMode.Ignore
-
-
-
         sparkSession.close();
 
 
